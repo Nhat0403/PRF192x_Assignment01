@@ -194,12 +194,12 @@ submitBtn.addEventListener("click", function (e) {
 
   if (validate) {
     petArr.push(data);
-    // clearInput();
     renderTableData(petArr);
     isHealthy(data);
     if (healthy) {
       healthyPet.push(data);
     }
+    clearInput();
   }
 });
 
