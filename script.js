@@ -108,9 +108,9 @@ function renderTableData(petArr) {
               }"></i></td>
               <td id='bmi-${petArr[i].id}'>?</td>
 							<td>${petArr[i].date}</td>
-							<td><button type="button" class="btn btn-danger" id="delete-${
-                petArr[i].id
-              }">Delete</button>
+							<td><button type="button" class="btn btn-danger" id="${petArr[i].id}"
+              onclick="deletePet(this.id)"
+              >Delete</button>
 							</td>
 				    </tr>
   `;
@@ -134,27 +134,30 @@ function clearInput() {
 }
 
 // xoá một thú cưng
-function deletePet() {
-  for (let i = 0; i < petArr.length; i++) {
-    const deletePetid = document.getElementById(`delete-${petArr[i].id}`);
-    const petArrid = document.getElementById(`pet-${petArr[i].id}`);
-    deletePetid.addEventListener("click", function () {
-      if (confirm("Are you sure?")) {
-        petArrid.remove();
-        // index gọi vị trí của obj cần xoá trong petArr
-        const index = petArr.indexOf(i);
-        const indexid = petArr[i].id;
-        for (let j = 0; j < healthyPet.length; j++) {
-          if (healthyPet[j].id === indexid) {
-            const indexhealthy = healthyPet.indexOf[j];
-            healthyPet.splice(indexhealthy, 1);
-          }
-        }
-        // xoá đúng 1 obj nằm ở vị trí đó trong petArr
+function deletePet(e) {
+  if (confirm("Are you sure?")) {
+    document.getElementById(`pet-${e}`).remove();
+    for (let i = 0; i < petArr.length; i++) {
+      if (petArr[i].id === e) {
+        const index = petArr[i].id;
         petArr.splice(index, 1);
+        healthyPet.splice(index, 1);
       }
-    });
+    }
   }
+}
+
+// kiểm tra các thú cưng khoẻ mạnh
+let healthy = true;
+const healthyPet = [];
+function isHealthy(data) {
+  if (
+    vaccinatedInput.checked &&
+    dewormedInput.checked &&
+    sterilizedInput.checked
+  ) {
+    healthy = true;
+  } else healthy = false;
 }
 
 // tính toán chỉ số bmi
@@ -193,9 +196,12 @@ submitBtn.addEventListener("click", function (e) {
 
   if (validate) {
     petArr.push(data);
-    // clearInput();
     renderTableData(petArr);
-    deletePet();
+    isHealthy(data);
+    if (healthy) {
+      healthyPet.push(data);
+    }
+    clearInput();
   }
 });
 
@@ -204,29 +210,15 @@ function showhidetoogle() {
   showAllBtn.classList.toggle("hidden");
 }
 
-const healthyPet = [];
-function isHealthy() {
-  for (let i = 0; i < petArr.length; i++) {
-    if (petArr[i].vaccinated && petArr[i].dewormed && petArr[i].sterilized) {
-      healthyPet.push(petArr[i]);
-      // để arr ko tự lặp chính nó
-      healthyPet.splice(i);
-    }
-  }
-}
-
 // hiển thị các thú cưng khoẻ mạnh
 healthyBtn.addEventListener("click", function () {
-  isHealthy();
   showhidetoogle();
   renderTableData(healthyPet);
-  deletePet(healthyPet);
 });
 
 showAllBtn.addEventListener("click", function () {
   showhidetoogle();
   renderTableData(petArr);
-  deletePet();
 });
 
 // tính toán chỉ số bmi
