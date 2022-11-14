@@ -76,6 +76,7 @@ function uniqueId() {
 
 // hiển thị danh sách thú cưng
 const petArr = [];
+
 function renderTableData(petArr) {
   tableBodyEl.innerHTML = "";
   for (let i = 0; i < petArr.length; i++) {
@@ -133,16 +134,21 @@ function clearInput() {
   sterilizedInput.checked = false;
 }
 
-// xoá một thú cưng
+// xoá 1 thú cưng
 function deletePet(e) {
   if (confirm("Are you sure?")) {
     document.getElementById(`pet-${e}`).remove();
-    for (let i = 0; i < petArr.length; i++) {
-      if (petArr[i].id === e) {
-        const index = petArr[i].id;
-        petArr.splice(index, 1);
-        healthyPet.splice(index, 1);
-      }
+    // healthyPet.splice(e, 1);
+    spliceIndex(petArr, e);
+    spliceIndex(healthyPet, e);
+  }
+}
+
+// loại thú cưng ra khỏi mảng
+function spliceIndex(arr, e) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id === e) {
+      arr.splice(i, 1);
     }
   }
 }
@@ -161,14 +167,14 @@ function isHealthy(data) {
 }
 
 // tính toán chỉ số bmi
-function calcBMIPet() {
-  for (let i = 0; i < petArr.length; i++) {
-    const petBmi = document.getElementById(`bmi-${petArr[i].id}`);
-    const dogBmi = (petArr[i].weight * 703) / petArr[i].lengthPet ** 2;
-    const catBmi = (petArr[i].weight * 886) / petArr[i].lengthPet ** 2;
-    if (petArr[i].type === "Dog") {
+function calcBMIPet(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    const petBmi = document.getElementById(`bmi-${arr[i].id}`);
+    const dogBmi = (arr[i].weight * 703) / arr[i].lengthPet ** 2;
+    const catBmi = (arr[i].weight * 886) / arr[i].lengthPet ** 2;
+    if (arr[i].type === "Dog") {
       petBmi.textContent = dogBmi.toFixed(2);
-    } else if (petArr[i].type === "Cat") {
+    } else if (arr[i].type === "Cat") {
       petBmi.textContent = catBmi.toFixed(2);
     }
   }
@@ -201,16 +207,16 @@ submitBtn.addEventListener("click", function (e) {
     if (healthy) {
       healthyPet.push(data);
     }
-    clearInput();
+    // clearInput();
   }
 });
 
+// hiển thị các thú cưng khoẻ mạnh
 function showhidetoogle() {
   healthyBtn.classList.toggle("hidden");
   showAllBtn.classList.toggle("hidden");
 }
 
-// hiển thị các thú cưng khoẻ mạnh
 healthyBtn.addEventListener("click", function () {
   showhidetoogle();
   renderTableData(healthyPet);
@@ -222,4 +228,7 @@ showAllBtn.addEventListener("click", function () {
 });
 
 // tính toán chỉ số bmi
-calcBMIBtn.addEventListener("click", calcBMIPet);
+calcBMIBtn.addEventListener("click", function () {
+  calcBMIPet(healthyPet);
+  calcBMIPet(petArr);
+});
