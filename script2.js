@@ -16,6 +16,7 @@ const tableBodyEl = document.getElementById("tbody");
 const submitBtn = document.getElementById("submit-btn");
 const healthyBtn = document.getElementById("healthy-btn");
 const showAllBtn = document.getElementById("showall-btn");
+const calcBMIBtn = document.getElementById("calcBMI-btn");
 
 const d = new Date();
 const formatDate =
@@ -105,10 +106,11 @@ function renderTableData(petArr) {
                   ? "bi bi-check-circle-fill"
                   : "bi bi-x-circle-fill"
               }"></i></td>
+              <td id='bmi-${petArr[i].id}'>?</td>
 							<td>${petArr[i].date}</td>
-							<td><button type="button" class="btn btn-danger" id="delete-${
-                petArr[i].id
-              }">Delete</button>
+							<td><button type="button" class="btn btn-danger" id="${petArr[i].id}"
+              onclick="deletePet(this.id)"
+              >Delete</button>
 							</td>
 				    </tr>
   `;
@@ -132,26 +134,41 @@ function clearInput() {
 }
 
 // xoá một thú cưng
-function deletePet() {
+function deletePet(e) {
+  document.getElementById(`pet-${e}`).remove();
   for (let i = 0; i < petArr.length; i++) {
-    const deletePetid = document.getElementById(`delete-${petArr[i].id}`);
-    const petArrid = document.getElementById(`pet-${petArr[i].id}`);
-    deletePetid.addEventListener("click", function () {
-      if (confirm("Are you sure?")) {
-        petArrid.remove();
-        // index gọi vị trí của obj cần xoá trong petArr
-        const index = petArr.indexOf(i);
-        const indexid = petArr[i].id;
-        for (let j = 0; j < healthyPet.length; j++) {
-          if (healthyPet[j].id === indexid) {
-            const indexhealthy = healthyPet.indexOf[j];
-            healthyPet.splice(indexhealthy, 1);
-          }
-        }
-        // xoá đúng 1 obj nằm ở vị trí đó trong petArr
-        petArr.splice(index, 1);
-      }
-    });
+    if (petArr[i].id === e) {
+      const index = petArr[i].id;
+      petArr.splice(index, 1);
+      healthyPet.splice(index, 1);
+    }
+  }
+}
+
+// kiểm tra các thú cưng khoẻ mạnh
+let healthy = true;
+const healthyPet = [];
+function isHealthy(data) {
+  if (
+    vaccinatedInput.checked &&
+    dewormedInput.checked &&
+    sterilizedInput.checked
+  ) {
+    healthy = true;
+  } else healthy = false;
+}
+
+// tính toán chỉ số bmi
+function calcBMIPet() {
+  for (let i = 0; i < petArr.length; i++) {
+    const petBmi = document.getElementById(`bmi-${petArr[i].id}`);
+    const dogBmi = (petArr[i].weight * 703) / petArr[i].lengthPet ** 2;
+    const catBmi = (petArr[i].weight * 886) / petArr[i].lengthPet ** 2;
+    if (petArr[i].type === "Dog") {
+      petBmi.textContent = dogBmi.toFixed(2);
+    } else if (petArr[i].type === "Cat") {
+      petBmi.textContent = catBmi.toFixed(2);
+    }
   }
 }
 
@@ -179,7 +196,10 @@ submitBtn.addEventListener("click", function (e) {
     petArr.push(data);
     // clearInput();
     renderTableData(petArr);
-    deletePet();
+    isHealthy(data);
+    if (healthy) {
+      healthyPet.push(data);
+    }
   }
 });
 
@@ -188,26 +208,16 @@ function showhidetoogle() {
   showAllBtn.classList.toggle("hidden");
 }
 
-const healthyPet = [];
-function isHealthy() {
-  for (let i = 0; i < petArr.length; i++) {
-    if (petArr[i].vaccinated && petArr[i].dewormed && petArr[i].sterilized) {
-      healthyPet.push(petArr[i]);
-      // để arr ko tự lặp chính nó
-      healthyPet.splice(i);
-    }
-  }
-}
 // hiển thị các thú cưng khoẻ mạnh
 healthyBtn.addEventListener("click", function () {
-  isHealthy();
   showhidetoogle();
   renderTableData(healthyPet);
-  deletePet();
 });
 
 showAllBtn.addEventListener("click", function () {
   showhidetoogle();
   renderTableData(petArr);
-  deletePet();
 });
+
+// tính toán chỉ số bmi
+calcBMIBtn.addEventListener("click", calcBMIPet);
