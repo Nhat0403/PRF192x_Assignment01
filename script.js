@@ -207,7 +207,7 @@ submitBtn.addEventListener("click", function (e) {
     if (healthy) {
       healthyPet.push(data);
     }
-    // clearInput();
+    clearInput();
   }
 });
 
